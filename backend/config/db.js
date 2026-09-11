@@ -21,7 +21,10 @@ if (DB_TYPE === 'mysql') {
   });
   console.log('[DB Config] Configured for MySQL server connection');
 } else {
-  const dbPath = path.resolve(__dirname, '../database.sqlite');
+  const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
+  const dbPath = isVercel || process.env.DB_FILE === ':memory:'
+    ? ':memory:'
+    : path.resolve(__dirname, '../database.sqlite');
   sqliteDb = new sqlite3.Database(dbPath, (err) => {
     if (err) {
       console.error('[DB Config] Error opening SQLite database:', err.message);

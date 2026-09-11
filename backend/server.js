@@ -22,10 +22,28 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+let dbInitPromise = null;
+const ensureDbInitialized = () => {
+  if (!dbInitPromise) {
+    dbInitPromise = initializeDatabase();
+  }
+  return dbInitPromise;
+};
+
 // Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Ensure DB is initialized before handling incoming API requests
+app.use(async (req, res, next) => {
+  try {
+    await ensureDbInitialized();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 // API Health Check
 app.get('/api/health', (req, res) => {
@@ -53,13 +71,24 @@ app.use('/api/audit', auditRoutes);
 app.use(errorHandler);
 
 // Boot server & init DB
-initializeDatabase().then(() => {
-  app.listen(PORT, () => {
-    console.log(`=======================================================`);
-    console.log(`🚀 Sales Analytics Backend Server running on port ${PORT}`);
-    console.log(`📊 Health Endpoint: http://localhost:${PORT}/api/health`);
-    console.log(`=======================================================`);
+// When running locally (node server.js / npm start), start the HTTP listener.
+// When imported by Vercel serverless (backend/api/index.js), just export the app.
+if (require.main === module) {
+  initializeDatabase().then(() => {
+    app.listen(PORT, () => {
+      console.log(`=======================================================`);
+      console.log(`🚀 Sales Analytics Backend Server running on port ${PORT}`);
+      console.log(`📊 Health Endpoint: http://localhost:${PORT}/api/health`);
+      console.log(`=======================================================`);
+    });
+  }).catch(err => {
+    console.error('[Server Boot Error]:', err);
   });
-}).catch(err => {
-  console.error('[Server Boot Error]:', err);
-});
+} else {
+  // Vercel serverless: initialize DB then export app
+  initializeDatabase().catch(err => {
+    console.error('[Server Boot Error]:', err);
+  });
+}
+
+module.exports = app;
