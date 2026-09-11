@@ -1,10 +1,15 @@
 const { execSync } = require('child_process');
+const path = require('path');
 const fs = require('fs');
 
-if (fs.existsSync('frontend')) {
-  console.log('[build] Running in root directory. Building frontend...');
-  execSync('cd frontend && npm install && npm run build', { stdio: 'inherit' });
-} else {
-  console.log('[build] Running inside frontend directory. Building directly...');
-  execSync('npm install && npm run build', { stdio: 'inherit' });
-}
+const frontendDir = fs.existsSync('frontend') 
+  ? path.resolve(__dirname, 'frontend') 
+  : path.resolve(__dirname);
+
+console.log('[build] Building frontend in directory:', frontendDir);
+
+// Install dependencies and run Vite build using cwd option
+execSync('npm install', { cwd: frontendDir, stdio: 'inherit' });
+execSync('npm run build', { cwd: frontendDir, stdio: 'inherit' });
+
+console.log('[build] Build completed successfully.');
