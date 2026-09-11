@@ -6,7 +6,7 @@
     "start": "node backend/server.js",
     "dev:backend": "node backend/server.js",
     "dev:frontend": "cd frontend && npm run dev",
-    "build": "cd frontend && npm install && npm run build"
+    "build": "node build.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
