@@ -8,8 +8,8 @@ const frontendDir = fs.existsSync('frontend')
 
 console.log('[build] Building frontend in directory:', frontendDir);
 
-// Install dependencies and run Vite build using cwd option
-execSync('npm install', { cwd: frontendDir, stdio: 'inherit' });
+// Pass --include=dev to ensure build tools like Vite are always installed
+execSync('npm install --include=dev', { cwd: frontendDir, stdio: 'inherit' });
 execSync('npm run build', { cwd: frontendDir, stdio: 'inherit' });
 
 console.log('[build] Build completed successfully.');
