@@ -1,14 +1,14 @@
 {
   "version": 2,
-  "buildCommand": "node -e \"const fs=require('fs'); if (fs.existsSync('frontend')) { require('child_process').execSync('cd frontend && npm install && npm run build', {stdio: 'inherit'}); } else { require('child_process').execSync('npm install && npm run build', {stdio: 'inherit'}); }\"",
+  "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "source": "/api/:match*",
+      "destination": "/api"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/((?!api/.*).*)",
       "destination": "/index.html"
     }
   ]
