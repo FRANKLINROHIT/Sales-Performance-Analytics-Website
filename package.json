@@ -6,7 +6,7 @@
     "start": "node backend/server.js",
     "dev:backend": "node backend/server.js",
     "dev:frontend": "cd frontend && npm run dev",
-    "build": "node -e \"const fs=require('fs'); if (fs.existsSync('frontend')) { require('child_process').execSync('cd frontend && npm install && npm run build', {stdio: 'inherit'}); } else { require('child_process').execSync('npm install && npm run build', {stdio: 'inherit'}); }\""
+    "build": "cd frontend && npm install && npm run build"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
