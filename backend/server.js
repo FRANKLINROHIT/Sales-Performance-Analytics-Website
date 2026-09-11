@@ -46,26 +46,35 @@ app.use(async (req, res, next) => {
 });
 
 // API Health Check
-app.get('/api/health', (req, res) => {
+const healthHandler = (req, res) => {
   res.json({
     status: 'online',
     system: 'Sales Performance Analytics Web Portal',
     timestamp: new Date().toISOString()
   });
-});
+};
+app.get('/api/health', healthHandler);
+app.get('/health', healthHandler);
 
-// Register API Route modules
-app.use('/api/auth', authRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/sales', salesRoutes);
-app.use('/api/employees', employeeRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/customers', customerRoutes);
-app.use('/api/targets', targetRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/reports', reportRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/audit', auditRoutes);
+// Register API Route modules (both /api/xxx and /xxx to handle all Vercel route rewrites)
+const routeModules = [
+  ['/auth', authRoutes],
+  ['/dashboard', dashboardRoutes],
+  ['/sales', salesRoutes],
+  ['/employees', employeeRoutes],
+  ['/products', productRoutes],
+  ['/customers', customerRoutes],
+  ['/targets', targetRoutes],
+  ['/analytics', analyticsRoutes],
+  ['/reports', reportRoutes],
+  ['/admin', adminRoutes],
+  ['/audit', auditRoutes]
+];
+
+routeModules.forEach(([prefix, routeHandler]) => {
+  app.use(`/api${prefix}`, routeHandler);
+  app.use(prefix, routeHandler);
+});
 
 // Centralized error handler
 app.use(errorHandler);
