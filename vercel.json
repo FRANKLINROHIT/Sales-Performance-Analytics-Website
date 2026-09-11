@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "buildCommand": "node -e \"const fs=require('fs'); if (fs.existsSync('frontend')) { require('child_process').execSync('cd frontend && npm install && npm run build', {stdio: 'inherit'}); } else { require('child_process').execSync('npm install && npm run build', {stdio: 'inherit'}); }\"",
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {

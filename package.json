@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm install && npm run build"
+    "build": "node -e \"const fs=require('fs'); if (fs.existsSync('frontend')) { require('child_process').execSync('cd frontend && npm install && npm run build', {stdio: 'inherit'}); } else { require('child_process').execSync('npm install && npm run build', {stdio: 'inherit'}); }\""
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
