@@ -56,6 +56,13 @@ const updateUserRole = async (req, res, next) => {
     const { id } = req.params;
     const { role } = req.body;
 
+    if (parseInt(id) === req.user.user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot change your own role while logged in as Admin.'
+      });
+    }
+
     await query(`UPDATE Users SET role = ? WHERE user_id = ?`, [role, id]);
 
     res.json({ success: true, message: `User role updated to ${role}.` });

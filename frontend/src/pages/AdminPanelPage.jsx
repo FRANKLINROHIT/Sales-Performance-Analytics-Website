@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { apiFetch } from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 import { NotificationContext } from '../context/NotificationContext';
 import { ShieldCheck, UserPlus, Trash2, Edit, Eye, EyeOff } from 'lucide-react';
 
 export const AdminPanelPage = () => {
+  const { user: currentUser } = useContext(AuthContext);
   const { addToast } = useContext(NotificationContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +52,10 @@ export const AdminPanelPage = () => {
   };
 
   const handleRoleChange = async (userId, newRole) => {
+    if (currentUser && userId === currentUser.user_id) {
+      addToast('You cannot change your own role while logged in as Admin.', 'warning');
+      return;
+    }
     try {
       await apiFetch(`/admin/users/${userId}/role`, {
         method: 'PUT',
@@ -63,6 +69,10 @@ export const AdminPanelPage = () => {
   };
 
   const handleDeleteUser = async (userId) => {
+    if (currentUser && userId === currentUser.user_id) {
+      addToast('You cannot delete your own active Admin session account.', 'warning');
+      return;
+    }
     if (!window.confirm('Are you sure you want to revoke this user account?')) return;
     try {
       await apiFetch(`/admin/users/${userId}`, { method: 'DELETE' });
@@ -102,35 +112,70 @@ export const AdminPanelPage = () => {
             <tbody>
               {loading ? (
                 <tr><td colSpan="6" style={{ textAlign: 'center', padding: '24px' }}>Loading system accounts...</td></tr>
-              ) : users.map(u => (
-                <tr key={u.user_id}>
-                  <td style={{ fontWeight: 700 }}>#{u.user_id}</td>
-                  <td style={{ fontWeight: 700 }}>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>
-                    <select
-                      className="input-field"
-                      style={{ width: '130px', padding: '4px 8px', fontSize: '0.8rem' }}
-                      value={u.role}
-                      onChange={e => handleRoleChange(u.user_id, e.target.value)}
-                    >
-                      <option value="Admin">Admin</option>
-                      <option value="Manager">Manager</option>
-                      <option value="Salesperson">Salesperson</option>
-                    </select>
-                  </td>
-                  <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{u.created_at ? new Date(u.created_at).toLocaleDateString() : 'System Default'}</td>
-                  <td>
-                    <button
-                      onClick={() => handleDeleteUser(u.user_id)}
-                      style={{ background: 'none', border: 'none', color: 'var(--accent-danger)', cursor: 'pointer' }}
-                      title="Delete User Account"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              ) : users.map(u => {
+                const isCurrentUser = currentUser && u.user_id === currentUser.user_id;
+                return (
+                  <tr key={u.user_id}>
+                    <td style={{ fontWeight: 700 }}>#{u.user_id}</td>
+                    <td style={{ fontWeight: 700 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span>{u.name}</span>
+                        {isCurrentUser && (
+                          <span style={{
+                            fontSize: '0.68rem',
+                            fontWeight: 600,
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            background: 'rgba(99, 102, 241, 0.15)',
+                            color: 'var(--accent-primary)',
+                            border: '1px solid rgba(99, 102, 241, 0.3)'
+                          }}>
+                            You
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td>{u.email}</td>
+                    <td>
+                      <select
+                        className="input-field"
+                        style={{
+                          width: '130px',
+                          padding: '4px 8px',
+                          fontSize: '0.8rem',
+                          opacity: isCurrentUser ? 0.6 : 1,
+                          cursor: isCurrentUser ? 'not-allowed' : 'pointer'
+                        }}
+                        value={u.role}
+                        disabled={isCurrentUser}
+                        title={isCurrentUser ? 'You cannot change your own role while logged in as Admin' : 'Change user role'}
+                        onChange={e => handleRoleChange(u.user_id, e.target.value)}
+                      >
+                        <option value="Admin">Admin</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Salesperson">Salesperson</option>
+                      </select>
+                    </td>
+                    <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{u.created_at ? new Date(u.created_at).toLocaleDateString() : 'System Default'}</td>
+                    <td>
+                      <button
+                        onClick={() => handleDeleteUser(u.user_id)}
+                        disabled={isCurrentUser}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: isCurrentUser ? 'var(--text-muted)' : 'var(--accent-danger)',
+                          cursor: isCurrentUser ? 'not-allowed' : 'pointer',
+                          opacity: isCurrentUser ? 0.35 : 1
+                        }}
+                        title={isCurrentUser ? 'Cannot delete your own active Admin session account' : 'Delete User Account'}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
