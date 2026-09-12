@@ -52,31 +52,23 @@ export const LoginPage = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      width: '100vw',
+      width: '100%',
+      maxWidth: '100%',
       background: 'var(--bg-primary)',
       display: 'flex',
       alignItems: 'center',
-      justify: 'center',
-      padding: '24px'
+      justifyContent: 'center',
+      padding: '16px'
     }}>
       {/* Centered Container Card with Salesperson Banner Image */}
-      <div className="glass-card" style={{
-        width: '100%',
-        maxWidth: '860px',
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        padding: 0,
-        overflow: 'hidden',
-        borderRadius: '20px',
-        boxShadow: 'var(--shadow-lg)'
-      }}>
-        {/* Left Side: Salesperson Hero Image & Banner */}
-        <div style={{
+      <div className="glass-card login-card-grid">
+        {/* Left Side: Salesperson Hero Image & Banner (Desktop/Tablet) */}
+        <div className="login-hero-panel" style={{
           position: 'relative',
           background: '#0f172a',
           display: 'flex',
           flexDirection: 'column',
-          justify: 'flex-end',
+          justifyContent: 'flex-end',
           padding: '32px',
           color: '#fff',
           overflow: 'hidden'
@@ -123,11 +115,30 @@ export const LoginPage = () => {
           </div>
         </div>
 
-        {/* Right Side: Centered Form */}
-        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {/* Right Side: Form */}
+        <div style={{ padding: '28px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          {/* Compact Mobile Brand Header */}
+          <div className="login-compact-brand" style={{ display: 'none', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'var(--accent-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <TrendingUp size={20} color="#fff" />
+            </div>
+            <div>
+              <h1 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>SalesPulse</h1>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Sales Management</span>
+            </div>
+          </div>
+
           {/* Header */}
-          <div style={{ marginBottom: '20px' }}>
-            <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+          <div style={{ marginBottom: '18px' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {mode === 'login' ? 'Sign In to SalesPulse' : 'Create an Account'}
             </h2>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px' }}>

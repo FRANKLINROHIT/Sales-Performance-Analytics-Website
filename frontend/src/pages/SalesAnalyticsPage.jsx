@@ -70,12 +70,12 @@ export const SalesAnalyticsPage = ({ onSaleCreated }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Top Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header">
         <div>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Sales Transactions & Analytics</h3>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Filter, search, and manage corporate sales records</span>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button className="btn btn-secondary" onClick={handleExport}>
             <Download size={16} /> Export CSV
           </button>
@@ -128,11 +128,11 @@ export const SalesAnalyticsPage = ({ onSaleCreated }) => {
           <option value="Services">Services</option>
         </select>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', flex: '1 1 auto' }}>
           <input
             type="date"
             className="input-field"
-            style={{ width: '140px' }}
+            style={{ minWidth: '130px', flex: '1 1 130px' }}
             value={startDate}
             onChange={e => { setStartDate(e.target.value); setPage(1); }}
           />
@@ -140,7 +140,7 @@ export const SalesAnalyticsPage = ({ onSaleCreated }) => {
           <input
             type="date"
             className="input-field"
-            style={{ width: '140px' }}
+            style={{ minWidth: '130px', flex: '1 1 130px' }}
             value={endDate}
             onChange={e => { setEndDate(e.target.value); setPage(1); }}
           />

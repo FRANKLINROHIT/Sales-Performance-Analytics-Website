@@ -61,7 +61,7 @@ export const TargetManagementPage = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header">
         <div>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Quota & Target Management</h3>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Configure regional and salesperson sales benchmarks</span>
@@ -125,8 +125,8 @@ export const TargetManagementPage = () => {
 
       {/* Target Modal */}
       {isModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 90 }}>
-          <div className="glass-card" style={{ width: '420px', padding: '24px' }}>
+        <div className="modal-overlay">
+          <div className="glass-card modal-content" style={{ maxWidth: '420px', padding: '24px' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '16px' }}>Assign Sales Quota Target</h3>
             <form onSubmit={handleSaveTarget} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>

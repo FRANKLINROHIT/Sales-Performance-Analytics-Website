@@ -61,7 +61,7 @@ export const ProductAnalyticsPage = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header">
         <div>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Product Portfolio Analytics</h3>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Revenue breakdown, profit margins, and catalog inventory</span>
@@ -89,7 +89,7 @@ export const ProductAnalyticsPage = () => {
 
         <select
           className="input-field"
-          style={{ width: '200px' }}
+          style={{ width: '100%', maxWidth: '200px' }}
           value={categoryFilter}
           onChange={e => setCategoryFilter(e.target.value)}
         >
@@ -147,8 +147,8 @@ export const ProductAnalyticsPage = () => {
 
       {/* Add Product Modal */}
       {isAddOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 90 }}>
-          <div className="glass-card" style={{ width: '450px', padding: '24px' }}>
+        <div className="modal-overlay">
+          <div className="glass-card modal-content" style={{ maxWidth: '450px', padding: '24px' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '16px' }}>Add Product to Catalog</h3>
             <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>

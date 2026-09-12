@@ -42,20 +42,11 @@ export const SaleModal = ({ isOpen, onClose, onRefresh, addToast }) => {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(0, 0, 0, 0.6)',
-      backdropFilter: 'blur(8px)',
-      display: 'flex',
-      alignItems: 'center',
-      justify: 'center',
-      zIndex: 90
-    }}>
-      <div className="glass-card" style={{ width: '480px', padding: '24px', position: 'relative' }}>
+    <div className="modal-overlay">
+      <div className="glass-card modal-content" style={{ maxWidth: '480px', padding: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>Record Sales Transaction</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
             <X size={20} />
           </button>
         </div>
@@ -106,7 +97,7 @@ export const SaleModal = ({ isOpen, onClose, onRefresh, addToast }) => {
             </select>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
             <div>
               <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Quantity</label>
               <input
@@ -143,7 +134,7 @@ export const SaleModal = ({ isOpen, onClose, onRefresh, addToast }) => {
             </select>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px', flexWrap: 'wrap' }}>
             <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
             <button type="submit" className="btn btn-primary">
               <PlusCircle size={16} /> Record Sale

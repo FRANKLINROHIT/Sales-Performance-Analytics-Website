@@ -197,7 +197,7 @@ export const AdvancedAnalyticsPage = ({ dataVersion = 0 }) => {
       </div>
 
       {/* 3. Goal Simulator & Client Tiers */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+      <div className="grid-two-col">
         {/* Scenario Simulator */}
         <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <h4 style={{ fontSize: '0.98rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -256,7 +256,7 @@ export const AdvancedAnalyticsPage = ({ dataVersion = 0 }) => {
 
           {/* Simulation Output */}
           {simResult && (
-            <div style={{ padding: '12px', borderRadius: '10px', background: 'var(--bg-input)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div style={{ padding: '12px', borderRadius: '10px', background: 'var(--bg-input)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
               <div>
                 <span style={{ fontSize: '0.73rem', color: 'var(--text-muted)' }}>Estimated Revenue</span>
                 <p style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--accent-primary)', margin: 0 }}>
@@ -282,7 +282,7 @@ export const AdvancedAnalyticsPage = ({ dataVersion = 0 }) => {
         {/* Client Tiers */}
         <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <h4 style={{ fontSize: '0.98rem', fontWeight: 700 }}>Client Accounts Loyalty Tiers</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
             <div style={{ padding: '10px', borderRadius: '8px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
               <span className="badge badge-success">Top Accounts</span>
               <p style={{ fontSize: '1.1rem', fontWeight: 700, margin: '4px 0 0 0' }}>{data.customer_segmentation.champions.length} Clients</p>

@@ -85,7 +85,7 @@ export const AdminPanelPage = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header">
         <div>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>User Management & Governance</h3>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Manage user accounts, assign system roles, and configure regional access</span>
@@ -183,8 +183,8 @@ export const AdminPanelPage = () => {
 
       {/* Add User Modal */}
       {isAddUserOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 90 }}>
-          <div className="glass-card" style={{ width: '420px', padding: '24px' }}>
+        <div className="modal-overlay">
+          <div className="glass-card modal-content" style={{ maxWidth: '420px', padding: '24px' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '16px' }}>Register New User Account</h3>
             <form onSubmit={handleCreateUser} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>

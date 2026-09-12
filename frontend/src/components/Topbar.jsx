@@ -2,9 +2,9 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
 import { AuthContext } from '../context/AuthContext';
 import { NotificationContext } from '../context/NotificationContext';
-import { Sun, Moon, Bell, Search, RefreshCw, X, CheckCircle2, AlertTriangle, XCircle, Info } from 'lucide-react';
+import { Sun, Moon, Bell, Search, RefreshCw, X, CheckCircle2, AlertTriangle, XCircle, Info, Menu } from 'lucide-react';
 
-export const Topbar = ({ onSearch, activeTitle }) => {
+export const Topbar = ({ onSearch, activeTitle, onToggleNav }) => {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const { user } = useContext(AuthContext);
   const { toasts, addToast, removeToast, clearAllToasts } = useContext(NotificationContext);
@@ -55,28 +55,39 @@ export const Topbar = ({ onSearch, activeTitle }) => {
       height: '66px',
       background: 'var(--bg-secondary)',
       borderBottom: '1px solid var(--border-color)',
-      padding: '0 24px',
+      padding: '0 16px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       position: 'sticky',
       top: 0,
-      zIndex: 30
+      zIndex: 30,
+      gap: '12px'
     }}>
       {/* Title & Page Subtitle */}
-      <div>
-        <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-          {titleMap[activeTitle] || activeTitle}
-        </h2>
-        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          Track sales performance, team targets, and client records
-        </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+        <button
+          className="nav-toggle-btn"
+          onClick={onToggleNav}
+          title="Toggle Navigation Menu"
+          aria-label="Toggle navigation menu"
+        >
+          <Menu size={18} />
+        </button>
+        <div style={{ minWidth: 0 }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {titleMap[activeTitle] || activeTitle}
+          </h2>
+          <span className="topbar-subtitle" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+            Track sales performance, team targets, and client records
+          </span>
+        </div>
       </div>
 
       {/* Right Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         {/* Search */}
-        <div style={{ position: 'relative', width: '240px' }}>
+        <div className="topbar-search-container" style={{ position: 'relative', width: '220px' }}>
           <Search size={15} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
@@ -144,6 +155,7 @@ export const Topbar = ({ onSearch, activeTitle }) => {
               right: 0,
               top: '44px',
               width: '320px',
+              maxWidth: 'calc(100vw - 32px)',
               padding: '14px',
               zIndex: 50,
               maxHeight: '400px',

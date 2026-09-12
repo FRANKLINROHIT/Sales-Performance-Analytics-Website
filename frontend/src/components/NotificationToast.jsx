@@ -10,12 +10,14 @@ export const NotificationToast = () => {
   return (
     <div style={{
       position: 'fixed',
-      bottom: '24px',
-      right: '24px',
+      bottom: '16px',
+      right: '16px',
       zIndex: 100,
       display: 'flex',
       flexDirection: 'column',
-      gap: '10px'
+      gap: '10px',
+      maxWidth: 'calc(100vw - 32px)',
+      pointerEvents: 'none'
     }}>
       {toasts.map(t => {
         let Icon = Info;
@@ -33,18 +35,20 @@ export const NotificationToast = () => {
               alignItems: 'center',
               gap: '12px',
               padding: '12px 16px',
-              minWidth: '280px',
+              width: '320px',
+              maxWidth: 'calc(100vw - 32px)',
               borderLeft: `4px solid ${borderColor}`,
-              boxShadow: 'var(--shadow-lg)'
+              boxShadow: 'var(--shadow-lg)',
+              pointerEvents: 'auto'
             }}
           >
             <Icon size={20} color={borderColor} />
-            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)', flex: 1, wordBreak: 'break-word' }}>
               {t.message}
             </span>
             <button
               onClick={() => removeToast(t.id)}
-              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', flexShrink: 0 }}
             >
               <X size={16} />
             </button>

@@ -33,7 +33,7 @@ export const AuditLogsPage = () => {
       </div>
 
       <div className="glass-card" style={{ padding: '16px' }}>
-        <div style={{ position: 'relative', width: '300px' }}>
+        <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
           <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"

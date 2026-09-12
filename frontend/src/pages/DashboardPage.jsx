@@ -69,14 +69,14 @@ export const DashboardPage = ({ dataVersion = 0 }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Top Filter Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header">
         <div>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Company Summary</h3>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Key financial metrics and revenue performance</span>
         </div>
         <select
           className="input-field"
-          style={{ width: '220px' }}
+          style={{ width: '100%', maxWidth: '220px' }}
           value={regionFilter}
           onChange={e => setRegionFilter(e.target.value)}
         >
@@ -90,7 +90,7 @@ export const DashboardPage = ({ dataVersion = 0 }) => {
       </div>
 
       {/* KPI Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+      <div className="grid-kpi">
         <KpiCard
           title="Total Revenue"
           value={formatCurrency(kpis.total_revenue)}
@@ -126,7 +126,7 @@ export const DashboardPage = ({ dataVersion = 0 }) => {
       </div>
 
       {/* Main Charts Section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
+      <div className="grid-chart-main">
         {/* Revenue & Profit Growth Trend */}
         <div className="glass-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -197,7 +197,7 @@ export const DashboardPage = ({ dataVersion = 0 }) => {
       </div>
 
       {/* Regional Performance & Top Performers */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+      <div className="grid-two-col">
         {/* Regional Sales Bar Chart */}
         <div className="glass-card">
           <div style={{ marginBottom: '16px' }}>

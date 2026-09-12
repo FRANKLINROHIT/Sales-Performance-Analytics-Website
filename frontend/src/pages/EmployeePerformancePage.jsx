@@ -40,16 +40,16 @@ export const EmployeePerformancePage = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Header Banner with Salesperson Hero Image */}
-      <div className="glass-card" style={{
+      <div className="glass-card hero-banner-flex" style={{
         position: 'relative',
         overflow: 'hidden',
         padding: '24px',
         display: 'flex',
         alignItems: 'center',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(236,72,153,0.08))'
       }}>
-        <div style={{ zIndex: 2, maxWidth: '60%' }}>
+        <div className="hero-banner-content" style={{ zIndex: 2, maxWidth: '60%' }}>
           <span className="badge badge-info" style={{ marginBottom: '8px' }}>Sales Force Performance</span>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '4px 0 6px 0' }}>Team Leaderboard & Achievements</h3>
           <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0 }}>
@@ -59,6 +59,7 @@ export const EmployeePerformancePage = () => {
         <img
           src="/salesperson_hero.png"
           alt="Sales Representative"
+          className="hero-banner-img"
           style={{
             height: '110px',
             width: '180px',
@@ -70,7 +71,7 @@ export const EmployeePerformancePage = () => {
       </div>
 
       {/* Leaderboard Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
         {employees.map((emp) => (
           <div key={emp.salesperson_id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -82,7 +83,7 @@ export const EmployeePerformancePage = () => {
                   background: emp.rank === 1 ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'var(--bg-input)',
                   display: 'flex',
                   alignItems: 'center',
-                  justify: 'center',
+                  justifyContent: 'center',
                   fontWeight: 800,
                   fontSize: '1.1rem',
                   color: emp.rank === 1 ? '#fff' : 'var(--text-primary)'
@@ -151,10 +152,10 @@ export const EmployeePerformancePage = () => {
           background: 'rgba(0, 0, 0, 0.6)',
           backdropFilter: 'blur(8px)',
           display: 'flex',
-          justify: 'flex-end',
+          justifyContent: 'flex-end',
           zIndex: 90
         }}>
-          <div className="glass-card" style={{ width: '500px', height: '100vh', borderRadius: 0, padding: '24px', overflowY: 'auto' }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: '500px', height: '100vh', borderRadius: 0, padding: '24px', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Salesperson Profile</h3>
               <button onClick={() => setSelectedEmp(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.2rem' }}>✕</button>

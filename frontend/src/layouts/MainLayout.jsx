@@ -17,6 +17,7 @@ import { AuditLogsPage } from '../pages/AuditLogsPage';
 export const MainLayout = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [globalSearch, setGlobalSearch] = useState('');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   // Incremented whenever a new sale is created — triggers data refetch in all pages
   const [dataVersion, setDataVersion] = useState(0);
 
@@ -55,14 +56,23 @@ export const MainLayout = () => {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: 'var(--bg-primary)' }}>
-      {/* Collapsible Sidebar */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="app-layout">
+      {/* Collapsible / Responsive Drawer Sidebar */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isOpen={isMobileNavOpen}
+        onClose={() => setIsMobileNavOpen(false)}
+      />
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <Topbar onSearch={setGlobalSearch} activeTitle={activeTab.replace('-', ' ')} />
-        <main style={{ padding: '24px', flex: 1, overflowY: 'auto' }}>
+      <div className="main-content-wrapper">
+        <Topbar
+          onSearch={setGlobalSearch}
+          activeTitle={activeTab.replace('-', ' ')}
+          onToggleNav={() => setIsMobileNavOpen(prev => !prev)}
+        />
+        <main className="page-content">
           {renderContent()}
         </main>
       </div>

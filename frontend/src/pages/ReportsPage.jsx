@@ -37,8 +37,8 @@ export const ReportsPage = () => {
         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Generate and export comprehensive financial, salesperson, product, and customer reports</span>
       </div>
 
-      <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <select className="input-field" style={{ width: '250px' }} value={reportType} onChange={e => setReportType(e.target.value)}>
+      <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+        <select className="input-field" style={{ width: '100%', maxWidth: '260px' }} value={reportType} onChange={e => setReportType(e.target.value)}>
           <option value="sales">Sales Transactions Report</option>
           <option value="employees">Salesperson Performance Report</option>
           <option value="products">Product Portfolio Report</option>
