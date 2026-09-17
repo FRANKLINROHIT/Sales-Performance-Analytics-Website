@@ -16,6 +16,7 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const auditRoutes = require('./routes/auditRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 dotenv.config();
 
@@ -68,7 +69,8 @@ const routeModules = [
   ['/analytics', analyticsRoutes],
   ['/reports', reportRoutes],
   ['/admin', adminRoutes],
-  ['/audit', auditRoutes]
+  ['/audit', auditRoutes],
+  ['/ai', aiRoutes]
 ];
 
 routeModules.forEach(([prefix, routeHandler]) => {
