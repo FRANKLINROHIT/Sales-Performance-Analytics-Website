@@ -214,7 +214,7 @@ export const AdvancedAnalyticsPage = ({ dataVersion = 0 }) => {
             <div>
               <h4 style={{ fontSize: '0.98rem', fontWeight: 700, margin: 0 }}>AI Forecast Insights</h4>
               <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                Powered by Llama 3.1 70B via Groq
+                Powered by Qwen3.8 27B via Groq
               </span>
             </div>
           </div>

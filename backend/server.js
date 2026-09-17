@@ -1,6 +1,8 @@
+const dotenv = require('dotenv');
+dotenv.config(); // ← Must be first so process.env is populated before any module reads it
+
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const initializeDatabase = require('./db/initDb');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -17,8 +19,6 @@ const reportRoutes = require('./routes/reportRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const auditRoutes = require('./routes/auditRoutes');
 const aiRoutes = require('./routes/aiRoutes');
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;

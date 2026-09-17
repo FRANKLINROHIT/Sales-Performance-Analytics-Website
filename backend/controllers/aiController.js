@@ -1,10 +1,12 @@
 const Groq = require('groq-sdk');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const MODEL = 'llama-3.1-70b-versatile';
+// Lazy client — reads process.env at request time (after dotenv.config() has run)
+const getGroqClient = () => new Groq({ apiKey: process.env.GROQ_API_KEY });
+const MODEL = 'qwen/qwen3.8-27b';
 
 // ─── Helper: call Groq with a system + user prompt ───────────────────────────
 const callGroq = async (systemPrompt, userPrompt, maxTokens = 900) => {
+  const groq = getGroqClient();
   const completion = await groq.chat.completions.create({
     model: MODEL,
     messages: [
