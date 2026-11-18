@@ -63,6 +63,8 @@ const getCustomers = async (req, res, next) => {
   }
 };
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const createCustomer = async (req, res, next) => {
   try {
     const { name, email, phone, company, location, region_id } = req.body;
@@ -71,9 +73,26 @@ const createCustomer = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Customer name and company are required.' });
     }
 
+    const cleanName = String(name).trim();
+    const cleanCompany = String(company).trim();
+    const cleanEmail = email ? String(email).trim().toLowerCase() : null;
+    const cleanPhone = phone ? String(phone).trim() : null;
+    const cleanLocation = location ? String(location).trim() : null;
+    const cleanRegionId = parseInt(region_id, 10) || 1;
+
+    if (cleanName.length < 2 || cleanName.length > 100) {
+      return res.status(400).json({ success: false, message: 'Customer name must be between 2 and 100 characters.' });
+    }
+    if (cleanCompany.length < 2 || cleanCompany.length > 100) {
+      return res.status(400).json({ success: false, message: 'Company name must be between 2 and 100 characters.' });
+    }
+    if (cleanEmail && (!EMAIL_REGEX.test(cleanEmail) || cleanEmail.length > 150)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid customer email address.' });
+    }
+
     const result = await query(
       `INSERT INTO Customers (name, email, phone, company, location, region_id) VALUES (?, ?, ?, ?, ?, ?)`,
-      [name, email, phone, company, location, region_id || 1]
+      [cleanName, cleanEmail, cleanPhone, cleanCompany, cleanLocation, cleanRegionId]
     );
 
     res.status(201).json({

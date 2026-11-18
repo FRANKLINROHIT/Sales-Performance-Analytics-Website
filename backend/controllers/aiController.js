@@ -36,17 +36,21 @@ const getForecastInsights = async (req, res, next) => {
 
     const { historicalData = [], forecastData = [], salespersonStats = [] } = req.body;
 
+    const safeHistorical = Array.isArray(historicalData) ? historicalData.slice(-12) : [];
+    const safeForecast = Array.isArray(forecastData) ? forecastData.slice(0, 6) : [];
+    const safeSalesperson = Array.isArray(salespersonStats) ? salespersonStats.slice(0, 20) : [];
+
     // ── Build a compact summary to keep token count low ──────────────────────
-    const historySummary = historicalData.slice(-6).map(d =>
-      `${d.month}: Revenue ₹${Math.round(d.revenue / 1000)}k, Profit ₹${Math.round(d.profit / 1000)}k, Margin ${d.profit_margin}%, MoM Growth ${d.growth_rate}%`
+    const historySummary = safeHistorical.slice(-6).map(d =>
+      `${d.month}: Revenue ₹${Math.round(Number(d.revenue || 0) / 1000)}k, Profit ₹${Math.round(Number(d.profit || 0) / 1000)}k, Margin ${d.profit_margin}%, MoM Growth ${d.growth_rate}%`
     ).join('\n');
 
-    const forecastSummary = forecastData.map(d =>
-      `${d.month}: Forecast Revenue ₹${Math.round(d.revenue / 1000)}k, Profit ₹${Math.round(d.profit / 1000)}k, Margin ${d.profit_margin}%`
+    const forecastSummary = safeForecast.map(d =>
+      `${d.month}: Forecast Revenue ₹${Math.round(Number(d.revenue || 0) / 1000)}k, Profit ₹${Math.round(Number(d.profit || 0) / 1000)}k, Margin ${d.profit_margin}%`
     ).join('\n');
 
-    const repSummary = salespersonStats.map(sp =>
-      `${sp.name} (${sp.region_name}): Total Sales ₹${Math.round(sp.total_sales / 1000)}k, Orders ${sp.order_count}, Performance Score ${sp.score}/100, Status: ${sp.status}`
+    const repSummary = safeSalesperson.map(sp =>
+      `${String(sp.name || 'Rep').slice(0, 30)} (${String(sp.region_name || 'Zone').slice(0, 20)}): Total Sales ₹${Math.round(Number(sp.total_sales || 0) / 1000)}k, Orders ${sp.order_count}, Performance Score ${sp.score}/100, Status: ${sp.status}`
     ).join('\n');
 
     const systemPrompt = `You are a senior sales analytics AI for an Indian B2B sales company called SalesPulse. 
@@ -118,8 +122,13 @@ const chatWithForecast = async (req, res, next) => {
     }
 
     const { message, context = {} } = req.body;
-    if (!message) {
-      return res.status(400).json({ success: false, message: 'message is required' });
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ success: false, message: 'A valid text message is required.' });
+    }
+
+    const cleanMessage = message.trim();
+    if (cleanMessage.length === 0 || cleanMessage.length > 500) {
+      return res.status(400).json({ success: false, message: 'Message must be between 1 and 500 characters.' });
     }
 
     const { historicalData = [], forecastData = [], salespersonStats = [] } = context;

@@ -23,6 +23,9 @@ const aiRoutes = require('./routes/aiRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Security: Disable X-Powered-By banner to avoid framework fingerprinting
+app.disable('x-powered-by');
+
 let dbInitPromise = null;
 const ensureDbInitialized = () => {
   if (!dbInitPromise) {
@@ -31,10 +34,60 @@ const ensureDbInitialized = () => {
   return dbInitPromise;
 };
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middlewares: Security Headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '0');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; img-src 'self' data: https:; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:* http://127.0.0.1:*"
+  );
+  next();
+});
+
+// CORS Configuration: Dynamic and secure origin validation
+const explicitOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
+  : [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'http://localhost:5173',
+      'http://127.0.0.1:5173',
+      'http://localhost:5000',
+      'http://127.0.0.1:5000'
+    ];
+
+const isAllowedOrigin = (origin) => {
+  // Allow requests without Origin header (e.g. server-to-server, curl, same-origin)
+  if (!origin) return true;
+
+  // In non-production, allow any localhost or 127.0.0.1 port
+  if (process.env.NODE_ENV !== 'production') {
+    if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return true;
+    }
+  }
+
+  // Explicit allowed origins check
+  return explicitOrigins.includes(origin);
+};
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
+    }
+    // Return callback(null, false) so CORS is safely omitted without throwing 500
+    return callback(null, false);
+  },
+  credentials: true
+}));
+
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Ensure DB is initialized before handling incoming API requests
 app.use(async (req, res, next) => {

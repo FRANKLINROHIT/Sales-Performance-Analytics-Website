@@ -6,4 +6,7 @@ dist/
 *.sqlite
 *.sqlite3
 database.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
 .vercel

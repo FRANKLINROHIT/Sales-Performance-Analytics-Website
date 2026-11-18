@@ -17,7 +17,9 @@ const getSales = async (req, res, next) => {
       order = 'DESC'
     } = req.query;
 
-    const offset = (page - 1) * limit;
+    const parsedLimit = Math.min(Math.max(parseInt(limit) || 10, 1), 100);
+    const parsedPage = Math.max(parseInt(page) || 1, 1);
+    const offset = (parsedPage - 1) * parsedLimit;
     let whereConditions = [];
     let params = [];
 
@@ -109,16 +111,16 @@ const getSales = async (req, res, next) => {
       LIMIT ? OFFSET ?
     `;
 
-    const sales = await query(listSql, [...params, parseInt(limit), parseInt(offset)]);
+    const sales = await query(listSql, [...params, parsedLimit, offset]);
 
     res.json({
       success: true,
       data: sales,
       pagination: {
         total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(total / limit)
+        page: parsedPage,
+        limit: parsedLimit,
+        totalPages: Math.ceil(total / parsedLimit)
       }
     });
   } catch (error) {
@@ -126,33 +128,57 @@ const getSales = async (req, res, next) => {
   }
 };
 
+const ALLOWED_PAYMENT_METHODS = new Set(['Bank Transfer', 'UPI', 'UPI / NetBanking', 'NetBanking', 'NEFT', 'Credit Card']);
+
 const createSale = async (req, res, next) => {
   try {
-    const { salesperson_id, customer_id, product_id, quantity, sale_date, payment_method } = req.body;
+    let { salesperson_id, customer_id, product_id, quantity, sale_date, payment_method } = req.body;
 
     if (!salesperson_id || !customer_id || !product_id || !quantity || !sale_date) {
       return res.status(400).json({ success: false, message: 'Missing required sale parameters.' });
     }
+
+    // Input validation: positive integer quantity
+    const parsedQty = parseInt(quantity, 10);
+    if (isNaN(parsedQty) || parsedQty <= 0 || parsedQty > 10000) {
+      return res.status(400).json({ success: false, message: 'Quantity must be a positive integer between 1 and 10,000.' });
+    }
+
+    // Authorization: Salespersons may only register sales under their own verified salesperson account
+    const requestedSalespersonId = parseInt(salesperson_id, 10);
+    if (req.user.role === 'Salesperson') {
+      if (!req.user.salesperson_id) {
+        return res.status(403).json({ success: false, message: 'Your account is not mapped to an active salesperson record.' });
+      }
+      if (requestedSalespersonId !== parseInt(req.user.salesperson_id, 10)) {
+        return res.status(403).json({
+          success: false,
+          message: 'Forbidden. Salespersons cannot record sales under another team member account.'
+        });
+      }
+    }
+
+    const cleanPaymentMethod = ALLOWED_PAYMENT_METHODS.has(payment_method) ? payment_method : 'Bank Transfer';
 
     const product = await queryOne(`SELECT * FROM Products WHERE product_id = ?`, [product_id]);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Selected product not found.' });
     }
 
-    const salesperson = await queryOne(`SELECT * FROM Salespersons WHERE salesperson_id = ?`, [salesperson_id]);
+    const salesperson = await queryOne(`SELECT * FROM Salespersons WHERE salesperson_id = ?`, [requestedSalespersonId]);
     if (!salesperson) {
       return res.status(404).json({ success: false, message: 'Selected salesperson not found.' });
     }
 
-    const amount = parseFloat((product.price * quantity).toFixed(2));
-    const totalCost = parseFloat((product.cost * quantity).toFixed(2));
+    const amount = parseFloat((product.price * parsedQty).toFixed(2));
+    const totalCost = parseFloat((product.cost * parsedQty).toFixed(2));
     const profit = parseFloat((amount - totalCost).toFixed(2));
     const region_id = salesperson.region_id;
 
     const result = await query(
       `INSERT INTO Sales (salesperson_id, customer_id, product_id, region_id, quantity, amount, profit, sale_date, status, payment_method)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Completed', ?)`,
-      [salesperson_id, customer_id, product_id, region_id, quantity, amount, profit, sale_date, payment_method || 'Credit Card']
+      [requestedSalespersonId, customer_id, product_id, region_id, parsedQty, amount, profit, sale_date, cleanPaymentMethod]
     );
 
     const sale_id = result.insertId;
@@ -162,7 +188,7 @@ const createSale = async (req, res, next) => {
     await query(
       `INSERT INTO Commissions (sale_id, salesperson_id, rate_percentage, commission_amount, status)
        VALUES (?, ?, 5.00, ?, 'Pending')`,
-      [sale_id, salesperson_id, commission_amount]
+      [sale_id, requestedSalespersonId, commission_amount]
     );
 
     res.status(201).json({

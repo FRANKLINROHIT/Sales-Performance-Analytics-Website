@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "start": "node backend/server.js",
+    "dev": "node dev.js",
     "dev:backend": "node backend/server.js",
     "dev:frontend": "cd frontend && npm run dev",
-    "build": "node build.js"
+    "build": "node build.js",
+    "test": "node --test tests/security.test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

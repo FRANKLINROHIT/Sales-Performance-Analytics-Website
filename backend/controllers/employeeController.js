@@ -70,6 +70,11 @@ const getEmployees = async (req, res, next) => {
 const getEmployeeById = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const employeeId = parseInt(id);
+
+    if (isNaN(employeeId)) {
+      return res.status(400).json({ success: false, message: 'Invalid employee identifier.' });
+    }
 
     const employee = await queryOne(
       `SELECT sp.*, r.region_name, u.avatar 
@@ -77,32 +82,46 @@ const getEmployeeById = async (req, res, next) => {
        LEFT JOIN Regions r ON sp.region_id = r.region_id
        LEFT JOIN Users u ON sp.user_id = u.user_id
        WHERE sp.salesperson_id = ?`,
-      [id]
+      [employeeId]
     );
 
     if (!employee) {
       return res.status(404).json({ success: false, message: 'Salesperson record not found.' });
     }
 
-    const salesHistory = await query(
-      `SELECT s.sale_id, s.amount, s.profit, s.sale_date, p.product_name, c.name as customer_name
-       FROM Sales s
-       JOIN Products p ON s.product_id = p.product_id
-       JOIN Customers c ON s.customer_id = c.customer_id
-       WHERE s.salesperson_id = ?
-       ORDER BY s.sale_date DESC`,
-      [id]
-    );
+    // Access control check: Only Admin, Manager, or the employee themselves can view commissions and sales history
+    const isPrivileged = req.user.role === 'Admin' || req.user.role === 'Manager';
+    const isSelf = req.user.salesperson_id && parseInt(req.user.salesperson_id) === employeeId;
 
-    const commissions = await query(
-      `SELECT * FROM Commissions WHERE salesperson_id = ? ORDER BY commission_id DESC`,
-      [id]
-    );
+    let salesHistory = [];
+    let commissions = [];
+    let safeEmployee = { ...employee };
+
+    if (isPrivileged || isSelf) {
+      salesHistory = await query(
+        `SELECT s.sale_id, s.amount, s.profit, s.sale_date, p.product_name, c.name as customer_name
+         FROM Sales s
+         JOIN Products p ON s.product_id = p.product_id
+         JOIN Customers c ON s.customer_id = c.customer_id
+         WHERE s.salesperson_id = ?
+         ORDER BY s.sale_date DESC`,
+        [employeeId]
+      );
+
+      commissions = await query(
+        `SELECT * FROM Commissions WHERE salesperson_id = ? ORDER BY commission_id DESC`,
+        [employeeId]
+      );
+    } else {
+      // Redact sensitive compensation and personal details for other peers
+      delete safeEmployee.phone;
+      delete safeEmployee.target_amount;
+    }
 
     res.json({
       success: true,
       data: {
-        employee,
+        employee: safeEmployee,
         salesHistory,
         commissions
       }

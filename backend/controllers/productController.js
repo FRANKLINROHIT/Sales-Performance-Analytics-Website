@@ -64,16 +64,46 @@ const getProducts = async (req, res, next) => {
 
 const createProduct = async (req, res, next) => {
   try {
-    const { product_name, sku, category, price, cost, stock_quantity } = req.body;
+    const { product_name, sku, category, price, cost, stock_quantity = 100 } = req.body;
 
     if (!product_name || !sku || !category || price === undefined || cost === undefined) {
       return res.status(400).json({ success: false, message: 'Please provide all required product parameters.' });
     }
 
+    const numPrice = parseFloat(price);
+    const numCost = parseFloat(cost);
+    const numStock = parseInt(stock_quantity, 10);
+
+    if (isNaN(numPrice) || numPrice < 0) {
+      return res.status(400).json({ success: false, message: 'Price must be a non-negative number.' });
+    }
+    if (isNaN(numCost) || numCost < 0) {
+      return res.status(400).json({ success: false, message: 'Cost must be a non-negative number.' });
+    }
+    if (isNaN(numStock) || numStock < 0) {
+      return res.status(400).json({ success: false, message: 'Stock quantity must be a non-negative integer.' });
+    }
+
+    const cleanName = String(product_name).trim();
+    const cleanSku = String(sku).trim().toUpperCase();
+    const cleanCategory = String(category).trim();
+
+    if (cleanName.length < 2 || cleanName.length > 150) {
+      return res.status(400).json({ success: false, message: 'Product name must be between 2 and 150 characters.' });
+    }
+    if (cleanSku.length < 2 || cleanSku.length > 50) {
+      return res.status(400).json({ success: false, message: 'SKU must be between 2 and 50 characters.' });
+    }
+
+    const existingSku = await queryOne(`SELECT product_id FROM Products WHERE sku = ?`, [cleanSku]);
+    if (existingSku) {
+      return res.status(400).json({ success: false, message: 'A product with this SKU already exists.' });
+    }
+
     const result = await query(
       `INSERT INTO Products (product_name, sku, category, price, cost, stock_quantity)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [product_name, sku, category, price, cost, stock_quantity || 100]
+      [cleanName, cleanSku, cleanCategory, numPrice, numCost, numStock]
     );
 
     res.status(201).json({
@@ -89,11 +119,30 @@ const createProduct = async (req, res, next) => {
 const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const productId = parseInt(id, 10);
+    if (isNaN(productId) || productId <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid product identifier.' });
+    }
+
     const { product_name, sku, category, price, cost, stock_quantity } = req.body;
+
+    const numPrice = parseFloat(price);
+    const numCost = parseFloat(cost);
+    const numStock = parseInt(stock_quantity, 10);
+
+    if (isNaN(numPrice) || numPrice < 0) {
+      return res.status(400).json({ success: false, message: 'Price must be a non-negative number.' });
+    }
+    if (isNaN(numCost) || numCost < 0) {
+      return res.status(400).json({ success: false, message: 'Cost must be a non-negative number.' });
+    }
+    if (isNaN(numStock) || numStock < 0) {
+      return res.status(400).json({ success: false, message: 'Stock quantity must be a non-negative integer.' });
+    }
 
     await query(
       `UPDATE Products SET product_name = ?, sku = ?, category = ?, price = ?, cost = ?, stock_quantity = ? WHERE product_id = ?`,
-      [product_name, sku, category, price, cost, stock_quantity, id]
+      [String(product_name).trim(), String(sku).trim().toUpperCase(), String(category).trim(), numPrice, numCost, numStock, productId]
     );
 
     res.json({ success: true, message: 'Product details updated successfully.' });
@@ -105,7 +154,21 @@ const updateProduct = async (req, res, next) => {
 const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    await query(`DELETE FROM Products WHERE product_id = ?`, [id]);
+    const productId = parseInt(id, 10);
+    if (isNaN(productId) || productId <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid product identifier.' });
+    }
+
+    // Check if product is referenced in existing sales
+    const linkedSales = await queryOne(`SELECT COUNT(*) as count FROM Sales WHERE product_id = ?`, [productId]);
+    if (linkedSales && linkedSales.count > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot delete product: it is associated with existing completed sales records.'
+      });
+    }
+
+    await query(`DELETE FROM Products WHERE product_id = ?`, [productId]);
     res.json({ success: true, message: 'Product removed from catalog.' });
   } catch (error) {
     next(error);

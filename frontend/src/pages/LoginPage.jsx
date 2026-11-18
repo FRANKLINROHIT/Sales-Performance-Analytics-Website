@@ -318,12 +318,14 @@ export const LoginPage = () => {
                   <select
                     className="input-field"
                     value={role}
-                    onChange={e => setRole(e.target.value)}
+                    disabled
+                    style={{ opacity: 0.85, cursor: 'not-allowed' }}
                   >
-                    <option value="Admin">Admin (Full System Access)</option>
-                    <option value="Manager">Manager (Team & Regional Access)</option>
-                    <option value="Salesperson">Sales Representative</option>
+                    <option value="Salesperson">Sales Representative (Standard Account)</option>
                   </select>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}>
+                    Admin and Manager roles must be provisioned by an existing Administrator.
+                  </span>
                 </div>
 
                 {role === 'Salesperson' && (

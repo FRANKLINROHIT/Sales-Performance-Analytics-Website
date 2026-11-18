@@ -36,6 +36,10 @@ if (DB_TYPE === 'mysql') {
       console.log('[DB Config] Connected to SQLite database at:', dbPath);
       // Enable WAL mode for better concurrency (especially on Vercel /tmp)
       sqliteDb.run('PRAGMA journal_mode=WAL;');
+      // Enforce foreign key constraints (disabled by default in SQLite)
+      sqliteDb.run('PRAGMA foreign_keys = ON;');
+      // Set busy timeout to prevent immediate lock contention errors
+      sqliteDb.run('PRAGMA busy_timeout = 5000;');
     }
   });
 }
@@ -49,7 +53,8 @@ const query = (sql, params = []) => {
         .catch(err => reject(err));
     } else {
       const cleanSql = sql.trim();
-      const isSelect = cleanSql.toUpperCase().startsWith('SELECT') || cleanSql.toUpperCase().startsWith('PRAGMA');
+      const upperSql = cleanSql.toUpperCase();
+      const isSelect = upperSql.startsWith('SELECT') || upperSql.startsWith('PRAGMA') || upperSql.startsWith('WITH');
       
       if (isSelect) {
         sqliteDb.all(sql, params, (err, rows) => {

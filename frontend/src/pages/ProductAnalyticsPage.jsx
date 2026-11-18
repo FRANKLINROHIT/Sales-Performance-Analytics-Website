@@ -46,13 +46,38 @@ export const ProductAnalyticsPage = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault();
+    const numPrice = parseFloat(newProduct.price);
+    const numCost = parseFloat(newProduct.cost);
+
+    if (isNaN(numPrice) || numPrice < 0) {
+      addToast('Please enter a valid non-negative selling price.', 'warning');
+      return;
+    }
+    if (isNaN(numCost) || numCost < 0) {
+      addToast('Please enter a valid non-negative cost price.', 'warning');
+      return;
+    }
+
     try {
       await apiFetch('/products', {
         method: 'POST',
-        body: JSON.stringify(newProduct)
+        body: JSON.stringify({
+          ...newProduct,
+          price: numPrice,
+          cost: numCost,
+          stock_quantity: parseInt(newProduct.stock_quantity, 10) || 100
+        })
       });
       addToast('New product added to catalog.', 'success');
       setIsAddOpen(false);
+      setNewProduct({
+        product_name: '',
+        sku: '',
+        category: 'Software',
+        price: '',
+        cost: '',
+        stock_quantity: 100
+      });
       fetchProducts();
     } catch (e) {
       addToast(e.message, 'danger');

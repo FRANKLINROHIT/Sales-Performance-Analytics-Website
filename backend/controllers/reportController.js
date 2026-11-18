@@ -1,11 +1,34 @@
 const { query } = require('../config/db');
 
+const ALLOWED_REPORT_TYPES = new Set(['sales', 'employees', 'products', 'customers']);
+
 const getReportData = async (req, res, next) => {
   try {
     const { report_type = 'sales', start_date, end_date } = req.query;
 
+    if (!ALLOWED_REPORT_TYPES.has(report_type)) {
+      return res.status(400).json({ success: false, message: 'Invalid report type requested.' });
+    }
+
+    // Role-based scoping: Salespersons cannot export company-wide employee revenue rankings
+    if (report_type === 'employees' && req.user.role === 'Salesperson') {
+      return res.status(403).json({
+        success: false,
+        message: 'Forbidden. Salespersons cannot export overall employee compensation and performance reports.'
+      });
+    }
+
     let data = [];
     if (report_type === 'sales') {
+      let whereClause = '';
+      const params = [];
+
+      // Tenant/owner isolation: Salesperson only gets their own sales records
+      if (req.user.role === 'Salesperson' && req.user.salesperson_id) {
+        whereClause = 'WHERE s.salesperson_id = ?';
+        params.push(req.user.salesperson_id);
+      }
+
       data = await query(`
         SELECT s.sale_id, s.sale_date, sp.name as salesperson, c.name as customer, p.product_name as product, p.category, r.region_name as region, s.quantity, s.amount, s.profit
         FROM Sales s
@@ -13,8 +36,9 @@ const getReportData = async (req, res, next) => {
         JOIN Customers c ON s.customer_id = c.customer_id
         JOIN Products p ON s.product_id = p.product_id
         JOIN Regions r ON s.region_id = r.region_id
+        ${whereClause}
         ORDER BY s.sale_date DESC
-      `);
+      `, params);
     } else if (report_type === 'employees') {
       data = await query(`
         SELECT sp.name as salesperson, sp.email, r.region_name as region, sp.hire_date, COUNT(s.sale_id) as total_orders, COALESCE(SUM(s.amount), 0) as total_revenue, COALESCE(SUM(s.profit), 0) as total_profit
